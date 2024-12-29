@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'cloudinary',
     'geoip2',
+    'channels',
 ]
 
 
@@ -118,6 +119,7 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = "cddp.asgi.application"
 WSGI_APPLICATION = "cddp.wsgi.application"
 
 
