@@ -87,6 +87,7 @@ class UserLocation(gismodel.Model):
 class User(AbstractUser):
     """Base user model with enhanced fields and functionality"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    username = models.CharField(max_length=100, null=True, blank=True, unique=True)
     last_name = models.CharField(max_length=100, null=True, blank=True)
     first_name = models.CharField(max_length=100, null=True, blank=True)
     email = models.EmailField(_('email address'), unique=True)
