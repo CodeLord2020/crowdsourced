@@ -34,3 +34,20 @@ class ConversationFilter(filters.FilterSet):
 
     def filter_participant(self, queryset, name, value):
         return queryset.filter(participants__id=value)
+
+
+
+class MessageFilter(filters.FilterSet):
+    """Filter set for messages"""
+    before = filters.DateTimeFilter(field_name='created_at', lookup_expr='lt')
+    after = filters.DateTimeFilter(field_name='created_at', lookup_expr='gt')
+    unread = filters.BooleanFilter(method='filter_unread')
+
+    class Meta:
+        model = Message
+        fields = ['conversation', 'sender', 'before', 'after', 'unread']
+
+    def filter_unread(self, queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.exclude(read_by=self.request.user)
