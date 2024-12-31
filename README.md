@@ -135,9 +135,6 @@ The API is built using Django REST Framework. Swagger documentation can be acces
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
-
-[Add your chosen license here]
 
 ## Contact
 
