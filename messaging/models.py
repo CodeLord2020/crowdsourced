@@ -55,3 +55,54 @@ class ConversationParticipant(models.Model):
             models.Index(fields=['last_read_at']),
             models.Index(fields=['joined_at']),
         ]
+
+
+
+class Message(models.Model):
+    """Individual message within a conversation"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    conversation = models.ForeignKey(
+        Conversation,
+        on_delete=models.CASCADE,
+        related_name='messages'
+    )
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='sent_messages'
+    )
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_edited = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    read_by = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        through='MessageRead',
+        related_name='read_messages'
+    )
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['created_at']),
+            models.Index(fields=['conversation', 'created_at']),
+            models.Index(fields=['sender', 'created_at']),
+        ]
+        ordering = ['-created_at']
+
+
+
+class MessageRead(models.Model):
+    """Tracks when messages are read by participants"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    message = models.ForeignKey(Message, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    read_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['message', 'user']
+        indexes = [
+            models.Index(fields=['read_at']),
+        ]
