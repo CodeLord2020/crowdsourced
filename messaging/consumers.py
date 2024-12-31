@@ -146,4 +146,47 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         }))
 
+    @database_sync_to_async
+    def create_message(self, conversation_id, content):
+        try:
+            conversation = Conversation.objects.get(
+                id=conversation_id,
+                participants=self.user,
+                is_active=True
+            )
+            
+            message = Message.objects.create(
+                conversation=conversation,
+                sender=self.user,
+                content=content
+            )
+            
+            # Update conversation timestamp
+            conversation.save()
+            
+            # Serialize for broadcast
+            serializer = MessageSerializer(message)
+            return serializer.data
+            
+        except Conversation.DoesNotExist:
+            return None
+        
     
+    @database_sync_to_async
+    def mark_messages_read(self, conversation_id):
+        conversation = Conversation.objects.get(
+            id=conversation_id,
+            participants=self.user
+        )
+        
+        # Update participant's last_read timestamp
+        participant = conversation.participant_details.get(user=self.user)
+        participant.last_read_at = timezone.now()
+        participant.save()
+        
+        # Mark messages as read
+        unread_messages = conversation.messages.exclude(read_by=self.user)
+        MessageRead.objects.bulk_create([
+            MessageRead(message=msg, user=self.user)
+            for msg in unread_messages
+        ])
