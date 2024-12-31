@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'cloudinary',
     'geoip2',
+    'rangefilter',
     'channels',
 ]
 
