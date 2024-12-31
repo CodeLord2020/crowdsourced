@@ -12,6 +12,7 @@ from .models import Conversation, Message, ConversationParticipant, MessageRead
 from .serializers import ConversationSerializer, MessageSerializer
 from .permissions import IsConversationParticipant, IsMessageSender
 from .filters import ConversationFilter, MessageFilter
+from django.core.exceptions import PermissionDenied
 
 
 
@@ -107,3 +108,5 @@ class MessageViewSet(viewsets.ModelViewSet):
         instance.is_deleted = True
         instance.deleted_at = timezone.now()
         instance.save()
+
+
